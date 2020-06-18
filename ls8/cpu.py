@@ -2,6 +2,7 @@
 
 import sys
 
+SP = 7
 
 class CPU:
     """Main CPU class."""
@@ -16,6 +17,8 @@ class CPU:
             0b10000010: self.LDI,
             0b01000111: self.PRN,
             0b10100010: self.MUL,
+            0b01000101: self.PUSH,
+            0b01000110: self.POP,
         }
 
     def ram_read(self, mar):
@@ -25,6 +28,15 @@ class CPU:
     def ram_write(self, mdr, mar):
         # mdr is the data being written
         self.ram[mar] = mdr
+
+    def push_value(self, value):
+        self.reg[SP] -= 1
+        self.ram_write(value, self.reg[SP])
+
+    def pop_value(self):
+        value = self.ram_read(self.reg[SP])
+        self.reg[SP] += 1
+        return value      
 
     def load(self, filename):
         """Load a program into memory."""
@@ -84,6 +96,14 @@ class CPU:
     def MUL(self, operand_a, operand_b):
         self.reg[operand_a] *= self.reg[operand_b]
         self.pc += 3
+
+    def PUSH(self, operand_a, operand_b):
+        self.push_value(self.reg[operand_a])     
+        self.pc += 2
+
+    def POP(self, operand_a, operand_b):
+        self.reg[operand_a] = self.pop_value()                                       
+        self.pc +=2     
 
     def run(self):
         """Run the CPU."""
