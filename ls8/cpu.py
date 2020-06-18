@@ -17,8 +17,11 @@ class CPU:
             0b10000010: self.LDI,
             0b01000111: self.PRN,
             0b10100010: self.MUL,
+            0b10100000: self.ADD,
             0b01000101: self.PUSH,
             0b01000110: self.POP,
+            0b00010001: self.RET,
+            0b01010000: self.CALL,
         }
 
     def ram_read(self, mar):
@@ -93,6 +96,10 @@ class CPU:
         print(self.reg[operand_a])
         self.pc += 2
 
+    def ADD(self, operand_a, operand_b):
+        self.reg[operand_a] += self.reg[operand_b]
+        self.pc += 3
+
     def MUL(self, operand_a, operand_b):
         self.reg[operand_a] *= self.reg[operand_b]
         self.pc += 3
@@ -104,6 +111,13 @@ class CPU:
     def POP(self, operand_a, operand_b):
         self.reg[operand_a] = self.pop_value()                                       
         self.pc +=2     
+    
+    def CALL(self, operand_a, operand_b):
+        self.push_value(self.pc + 2)
+        self.pc = self.reg[operand_a]
+
+    def RET(self, operand_a, operand_b):
+        self.pc = self.pop_value()
 
     def run(self):
         """Run the CPU."""
